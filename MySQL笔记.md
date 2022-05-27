@@ -1,4 +1,4 @@
-# MySQL数据库
+# MySQL数据库管理系统
 
 ## 0、引言：
 
@@ -227,13 +227,111 @@ alter--使什么改变
 
 #### 1.2.4、DML
 
+1. 添加数据(INSERT)
+2. 修改数据(UPDATE)
+3. 删除数据(DELETE)
+
+##### 1、DML-添加数据
+
+1. 给指定字段添加数据
+
+   ```sql
+   insert into 表名(字段1,字段2...) values (值1,值2...)
+   ```
+
+2. 给所有字段赋值
+
+   ```sql
+   insert into 表名 values (值1,值2...)
+   ```
+
+3. 批量添加数据
+
+   ```sql
+   insert into 表名(字段1,字段2...) values (值1,值2...),(值1,值2...),(值1,值2...);
+   
+   insert into 表名 values (值1,值2...),(值1,值2...),(值1,值2...);
+   ```
+
+   ```sql
+   #创建employee表
+   create table employee(
+       id int comment '编号',
+       name varchar(10) comment '姓名',
+       gender char(1) comment '性别',
+       age tinyint comment '年龄',
+       id_card char(18) comment '二代身份证18位',
+       entrydate date comment '日期'
+   );
+   
+   #把年龄字段修改为无符号数
+   alter table employee change age age tinyint unsigned comment '年龄';
+   
+   #添加数据
+   insert into employee (id, name, gender, age, id_card, entrydate)
+   values (1,'张三','男',18,'123456789012345678','2022-01-01');
+   #查询数据
+   select *
+   from employee;
+   
+   #测试年龄为负数可不可以插入
+   # insert into employee (id, name, gender, age, id_card, entrydate)
+   # values (2,'ww','男',-1,'123456789012345678','2022-01-01');
+   #不指定字段名
+   insert into employee values (2,'李四','男',18,'123456789442345678','2022-01-03');
+   
+   #批量添加数据(不指定字段名)
+   insert into employee
+   values (3,'王五','男',18,'123456789332345678','2022-01-03'),(4,'red','男',8,'123456780042345678','2022-03-03'),(5,'andy','男',8,'123456789442300678','2022-03-03');
+   
+   
+   ```
+
+   
+
+##### 2、DML-修改数据
+
+```sql
+update 表名 set 字段名1 = 值1,字段名2 = 值2,...[where 条件];
+```
+
+```sql
+#修改数据
+#修改id为1的名称为itheima
+update employee set name = 'itheima' where id = 1;
+#修改id为1的数据，name为jack，gender为女
+update employee set name = 'jack', gender = '女' where id = 1;
+#将所有员工入职日期修改为2022-01-01
+update employee set entrydate = '2022-01-01';
+```
 
 
 
+3、DML-删除数据
+
+```sql
+delete from 表名 [where 条件];
+```
+
+注意:
+
+- delete语句的条件可有可无，如果没有条件则会删除整张表的所有数据
+- delete语句不能删除某一个字段的值(可以使用update)(比如我们删除一个数据的某个字段比如年龄 我们就使用update语句把这个字段修改为null)
+
+```sql
+#删除数据
+#删除gender为女的数据
+delete from employee where gender='女';
+-- 删除所有员工
+delete
+from employee;
+```
 
 
 
 #### 1.2.5、DQL
+
+
 
 
 
