@@ -331,15 +331,430 @@ from employee;
 
 #### 1.2.5、DQL
 
+- 关键字select
+
+- 语法结构
+
+  ```sql
+  select
+  	字段列表
+  from
+  	列表名
+  where
+  	条件列表
+  group by
+  	分组字段列表
+  having
+  	分组后条件列表
+  order by
+  	排序字段列表
+  limit
+  	分页参数
+  ```
+
+1. 基本查询(select)
+2. 条件查询(where)
+3. 聚合函数(count、max、min、avg、sum)
+4. 分组查询(group by)
+5. 排序查询(order by)
+6. 分页查询(limit)
+
+##### 1、DQL-基本查询
+
+1. 查询多个字段
+
+   ```sql
+   select 字段1,字段2,字段3 ... from 表名;
+   select * from 表名;
+   
+   ```
+
+   <img src="https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202205290910758.png" style="zoom:50%;" />
+
+   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202205290912721.png)
+
+2. 设置别名
+
+   ```sql
+   select 字段1[as 别名1],字段2[as 别名2] ... from 表名;
+   #别名关键字as或者空一格
+   select id as '编号',name '姓名' from employee;
+   ```
+
+3. 去除重复记录
+
+   ```sql
+   select distinct 字段列表 from 表名;
+   #去重关键字 distinct
+   select distinct age from employee;
+   ```
+
+##### 2、DQL-条件查询
+
+1. 语法
+
+   ```sql
+   select 字段列表 from 表名 where 条件列表;
+   ```
+
+2. 条件
+
+   |    比较运算符    |                 功能                  |
+   | :--------------: | :-----------------------------------: |
+   |        >         |                 大于                  |
+   |        >=        |               大于等于                |
+   |        <         |                 小于                  |
+   |        <=        |               小于等于                |
+   |      <>或!=      |                不等于                 |
+   | between...and... |    在某个范围之内(含最小、最大值)     |
+   |     in(...)      |     在in之后的列表中的值，多选一      |
+   |   like 占位符    | 模糊匹配(_匹配单个字符,%匹配任意字符) |
+   |     is null      |                是null                 |
+
+   | 逻辑运算符 |   功能   |
+   | :--------: | :------: |
+   | and 或 &&  |   并且   |
+   | or 或 \|\| |   或者   |
+   |  not 或 !  | 非，不是 |
+
+3. 案例
+
+   ```sql
+   #查询年龄等于18的员工
+   select * from employee where age = 18;
+   #查询年龄小于20的员工信息
+   select *
+   from employee where employee.age < 18;
+   #查询没有身份证号的员工信息
+   select *
+   from employee where id_card is null ;
+   #查询有身份证号信息的员工
+   select *
+   from employee where id_card is not null ;
+   #查询年龄不等于88的员工
+   select *
+   from employee where employee.age <> 88;
+   #查询年龄在15到20之间的
+   select *
+   from employee where employee.age between 15 and 20;
+   #查询性别为女且年龄小于25
+   select *
+   from employee where gender = '男' and employee.age<15;
+   #查询年龄等于18或20或40
+   select *
+   from employee where employee.age = 18 or employee.age = 20 or employee.age = 40;
+   
+   select *
+   from employee where employee.age in (18,20,40);
+   #查询姓名为两个字的员工
+   select *
+   from employee where name like '__';
+   #查询姓张的
+   select *
+   from employee where name like '张%';
+   #查询身份证最后一位是X
+   select *
+   from employee where id_card like '%X';
+   ```
+
+##### 3、DQL-聚合函数
+
+1. 介绍
+
+   将一列数据作为整体进行纵向计算
+
+2. 常见的聚合函数
+
+   | 函数  |   功能   |
+   | :---: | :------: |
+   | count | 统计数量 |
+   |  max  |  最大值  |
+   |  min  |  最小值  |
+   |  avg  |  平均值  |
+   |  sum  |   求和   |
+
+3. 语法
+
+   ```sql
+   select 聚合函数(字段) from 表名;
+   ```
+
+注意：使用聚合函数的时候所有的null值不参与运算
+
+```sql
+#求总记录数
+select count(*)
+from employee;
+
+select count(employee.id) from employee;
+
+#统计平均年龄
+select avg(age) as '平均年龄' from employee;
+
+#求最大年龄
+select max(age) '最大年龄' from employee;
+#求最小年龄
+select min(age) '最小年龄' from employee;
+#统计入职日期为2022-01-03员工的年龄之和
+select sum(age) '2022-01-03的年龄之和' from employee where entrydate = '2022-01-03';
+
+```
+
+
+
+##### 4、DQL-分组查询
+
+1. 语法
+
+   ```sql
+   select 字段列表 from 表名 [where 条件] group by 分组字段名 [having 分组后过滤条件];
+   ```
+
+2. where和having区别
+
+   - 执行时机不同，where是在分组前进行过滤(不满足where条件的不参与分组)，而having是在分组后的结果进行过滤
+   - 判断条件不同：where不能对聚合函数进行判断，而having可以
+
+```sql
+#根据性别分组，统计男性员工和女员工的数量
+select gender,count(*) from employee group by gender;
+#根据性别分组，统计男和女的平均年龄
+select gender, avg(age) from employee group by gender;
+#查询年龄小于等于20的员工，并根据入职日期分组，获取员工数量大于等于2的入职日期
+select entrydate,count(*) from employee where age<=20 group by entrydate having count(entrydate)>=2
+```
+
+注意：
+
+- 执行顺序:where -> 聚合函数 -> having
+- **分组之后，查询的字段一般为聚合函数和分组字段，查询其他字段无任何意义!**
+
+
+
+##### 5、DQL-排序查询
+
+1. 语法
+
+   ```sql
+   select 字段列表 from 表名 order by 字段1 排序方式1,字段2 排序方式2;
+   ```
+
+2. 排序方式
+
+   - ASC升序(默认)
+   - DESC降序
+
+注意：如果是多字段排序，当第一个字段值相同时，才会按照第二个字段进行排序
+
+```sql
+#根据年龄进行升序排序
+select name,age,entrydate from employee order by age;
+#根据年龄进行降序排序
+select name,age,entrydate from employee order by age desc ;
+#根据年龄进行升序排序 当年龄相同时 根据入职日期进行降序排序
+select name,age,entrydate from employee order by age,entrydate desc ;
+```
 
 
 
 
 
+##### 6、DQL-分页查询
+
+1. 语句
+
+   ```sql
+   select
+   	字段列表
+   from
+   	表名列表
+   where
+   	条件列表
+   group by
+   	分组字段列表
+   having
+   	分组后条件列表
+   order by
+   	排序字段列表
+   limit
+   	分页参数
+   ```
+
+2. 语法
+
+   ```sql
+   select 字段列表 from 表名 limit 起始索引,查询记录;
+   ```
+
+3. 注意
+
+   - 起始索引从0开始，起始索引 = (查询页码-1)*每页显示记录数
+   - 分页查询是数据库的方言，不同数据库有不同的实现，MySQL中是limit
+   - 如果查询的是第一页数据，起始索引可以省略，直接简写为limit 10
+
+```sql
+#-----------limit------------
+select name from employee limit 0,3;
+select name from employee limit 3;
+select name from employee limit 3,3
+```
+
+
+
+##### 7、DQL-练习
+
+```sql
+#-----------练习------------
+#查询年龄分别为8，18，22
+select *
+from employee where age in (8,18,22);
+#查询性别为男，并且年龄在10-40岁以内的姓名为两个字的
+select *
+from employee where gender = '男' and age between 10 and 40 and name like '__';
+#统计员工表中，年龄10-20岁的，男女员工人数
+select gender,count(*) from employee where age between 10 and  20 group by gender;
+#查询所有年龄小于等于18岁的员工姓名和年龄，并对查询结果进行按照年龄升序排序，如果年龄相同就按照入职日期降序排序
+select name,age from employee where age <= 18 order by age,entrydate desc ;
+#查询性别为男，且年龄在10-20以内的前2个员工信息，并对查询结果进行按照年龄升序排序，如果年龄相同就按照入职日期降序排序
+select *
+from employee where gender = '男' and age between 10 and 20 order by age,entrydate desc limit 0,2;
+
+```
+
+
+
+##### 8、DQL-执行顺序
+
+编写顺序：
+
+```sql
+select
+	字段列表
+from
+	表名列表
+where
+	条件列表
+group by
+	分组字段列表
+having
+	分组后条件列表
+order by
+	排序字段列表
+limit
+	分页参数
+```
+
+执行顺序:
+
+```sql
+from
+	表名列表
+where
+	条件列表
+group by
+	分组字段列表
+having
+	分组后条件列表
+select
+	字段列表
+order by
+	排序字段列表
+limit
+	分页参数
+```
 
 
 
 
 
 #### 1.2.6、DCL
+
+##### 1、DCL-管理用户
+
+1. 查询用户
+
+   ```sql
+   use mysql;
+   select * from user;
+   ```
+
+2. 创建用户
+
+   ```sql
+   create user '用户名'@'主机名' identified by '密码';
+   ```
+
+3. 修改用户
+
+   ```sql
+   alter user '用户名'@'主机名' identified with mysql_native_password by '新密码';
+   ```
+
+4. 删除用户
+
+   ```sql
+   drop user '用户名'@'主机名';
+   ```
+
+##### 2、DCL-权限控制
+
+1. 查询权限
+
+   ```sql
+   show grants for '用户名'@'主机名';
+   ```
+
+2. 授予权限
+
+   ```sql
+   grant 权限列表 on 数据库名.表名 to '用户名'@'主机名';
+   ```
+
+3. 撤销权限
+
+   ```sql
+   revoke 权限列表 on 数据库名.表名 from '用户名'@'主机名';
+   ```
+
+
+
+
+
+### 1.3、函数
+
+**函数**是指一段可以直接被另一段程序调用的程序或代码
+
+#### 1.3.1、字符串函数
+
+
+
+
+
+
+
+
+
+#### 1.3.2、数值函数
+
+
+
+
+
+
+
+
+
+#### 1.3.3、日期函数
+
+
+
+
+
+
+
+
+
+
+
+#### 1.3.4、流程函数
 
