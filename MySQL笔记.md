@@ -835,9 +835,51 @@ select name as '姓名',datediff(CURDATE(),entrydate) as '入职时长' from emp
 |    case when [val1] then [res1]... else [default] end     |    如果val1为true，返回res1...，否则返回default默认值    |
 | case [expr] when [val1] then [res1]... else [default] end | 如果expr的值等于val1，返回res1...，否则返回default默认值 |
 
+```sql
+-- 流程控制函数
+-- if
+select if(true,'success','error');
+-- ifnull
+select ifnull('ok','default');
+select ifnull('','default');
+select ifnull(null,'default');
+-- case when then else end
+select name,case entrydate when '2022-01-01' then '元旦' when '2022-01-02' then '元旦下一天' else '其他' end  as '身份信息'
+from employee;
+
+select name,score,
+       case when score >= 85 then '优秀' when score >= 60 then '及格' else '不及格' end as '成绩' from employee order by score desc ;
+```
 
 
 
+### 1.4、约束
+
+#### 1.4.1、概念
+
+
+
+
+
+
+
+
+
+
+
+#### 1.4.2、约束演示
+
+
+
+
+
+
+
+
+
+
+
+#### 1.4.3、外键约束
 
 
 
