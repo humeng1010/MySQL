@@ -857,31 +857,342 @@ select name,score,
 
 #### 1.4.1、概念
 
+1. 概念：约束是作用于表中字段上的规则，用于限制存储在表中的数据。
 
+2. 目的：保证数据库中数据的正确、有效和完整性
 
+3. 分类：
 
-
-
-
-
+   |           约束           |                           描述                           |   关键字    |
+   | :----------------------: | :------------------------------------------------------: | :---------: |
+   |         非空约束         |                限制该字段的数据不能为null                |  not null   |
+   |         唯一约束         |         保证该字段的所有数据都是唯一的、不重复的         |   unique    |
+   |         主键约束         |         主键是一行数据的唯一标识、要求非空且唯一         | primary key |
+   |         默认约束         |      保存数据时，如果未指定该字段的值，则采用默认值      |   default   |
+   | 检查约束(8.0.16版本之后) |                保证字段的值满足某一个条件                |    check    |
+   |         外键约束         | 用来让两张表的数据之间建立联系，保证数据的一致性和完整性 | foreign key |
 
 
 
 #### 1.4.2、约束演示
 
+![image-20220601124722431](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011308914.png)
 
+```sql
+-- -------------------------约束演示------------------------------
+-- 删除表
+drop table if exists user;
+-- 创建表
+create table user(
+    id int primary key auto_increment comment 'id',
+    name varchar(10) not null unique comment '姓名',
+    age int check ( age between 0 and 120) comment '年龄',
+    status char(1) default 1 comment '状态',
+    gender char(1) comment '性别'
 
-
-
-
-
-
+) comment '用户表';
+-- 修改字段
+# alter table user change status status char(1) default 1 comment '状态';
+-- 插入数据
+insert into user (name, age, status, gender) values ('Red',59,'1','男'),('Andy',29,'0','男');
+insert into user (name, age, status, gender) values ('Blue',120,'1','男');
+insert into user (name, age,  gender) values ('Black3',20,'女');
+-- 查询数据
+select *
+from user;
+```
 
 
 
 #### 1.4.3、外键约束
 
+创建两张表--员工表和部门表
 
+sql如下：
+
+```sql
+-- -------------------约束(外键)----------------------
+-- 准备数据--创建表
+-- 部门表
+create table dept(
+    id int primary key auto_increment comment 'ID',
+    name varchar(50) not null comment '部门名称'
+)comment '部门表';
+
+insert into dept (id, name)
+values (1,'研发部'),(2,'市场部'),(3,'财务部'),(4,'销售部'),(5,'总经办');
+
+select *
+from dept;
+
+-- 员工表
+create table emp(
+    id int auto_increment comment 'ID' primary key ,
+    name varchar(50) not null comment '姓名',
+    age int comment '年龄',
+    job varchar(20) comment '职位',
+    salary int comment '薪水',
+    entry_date date comment '入职时间',
+    manager_id int comment '直属领导ID',
+    dept_id int comment '部门ID'
+)comment '员工表';
+
+insert into emp (name, age, job, salary, entry_date, manager_id, dept_id)
+values ('金庸',66,'总裁',20000,'2000-01-01',null,5),
+       ('张无忌',50,'项目经理',12500,'2005-02-03',1,1),
+       ('杨戬',22,'开发',15000,'2022-02-03',2,1),
+       ('二郎神',10,'开发',2500,'2022-04-03',3,1),
+       ('孙悟空',66,'开发',12500,'2005-02-03',3,1),
+       ('猪八戒',70,'运维',12500,'2005-02-03',3,1);
+
+select *
+from emp;
+```
+
+1. 语法：
+
+   添加外键
+
+   ```sql
+   create table 表名(
+   		字段名 数据类型,
+     	...
+     	[constraint] [外键名称] foreign key(外键字段名) references 主表(主表列名)
+   )comment 'xx表';
+   ```
+
+   ```sql
+   alter table 表名 add constraint 外键名称 foreign key(外键字段名) references 主表(主表列名);
+   alter table emp add constraint fk_emp_dept_id foreign key (dept_id) references dept(id);
+   ```
+
+   删除外键
+
+   ```sql
+   alter table 表名 drop foreign key 外键名称;
+   alter table emp drop foreign key fk_emp_dept_id;
+   ```
+
+   删除/更新行为
+
+   |    行为     |                             说明                             |
+   | :---------: | :----------------------------------------------------------: |
+   |  no action  | 当在父表中删除/更新对应的记录时，首先检查该记录是否有对应外键，如果有则不允许删除/更新。(与restrict一致) |
+   |  restrict   | 当在父表中删除/更新对应的记录时，首先检查该记录是否有对应外键，如果有则不允许删除/更新。(与no action一致) |
+   |   cascade   | 当在父表中删除/更新对应的记录时，首先检查该记录是否有对应外键，如果有，则也删除/更新外键在字表中的记录 |
+   |  set null   | 当在父表中删除对应的记录时，首先检查该记录是否有对应外键，如果有则设置子表中该外键值为null(这就要求外键允许为null) |
+   | set default |          父表有变更时，字表将外键列设置成一个默认值          |
+
+   ```sql
+   alter table 表名 add constraint 外键名称 foreign key(外键字段名) references 主表(主表列名) 
+   on update cascade on delete cascade;
+   -- 外键更新/删除行为
+   alter table emp add constraint fk_emp_dept_id foreign key (dept_id) references dept(id)
+       on update cascade on delete cascade ;
+   ```
+
+
+
+### 1.5、多表查询
+
+#### 1.5.1、多表关系
+
+1. 概述
+
+   在项目开发中，在进行数据库表结构设计时，会根据业务需求及业务模块之间的关系，分析并设计表结构，由于业务之间相互关联，所以**各个表结构之间也存在着各种联系**，基本上分为三种：
+
+   - 一对多(多对一)
+   - 多对多
+   - 一对一
+
+2. 一对多(多对一)：
+
+   - 案例：部门 与 员工的关系
+   - 关系：一个部门对应多个员工，多个员工对应一个部门
+   - 实现：在**多**的一方建立**外键**，指向**一**的一方的**主键**
+
+   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011415468.png)
+   
+3. 多对多
+
+   - 案例：学生 与 课程 的关系
+   - 关系：一个学生可以选修多门课程，一门课程可以供多个学生选择
+   - 实现：**建立第三张中间表，中间表至少包含两个外键，分别关联两方的主键**
+
+   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011421058.png)
+
+   ```sql
+   -- ------------多对多------------
+   -- 学生表
+   create table student(
+       id int primary key auto_increment comment '主键ID',
+       name varchar(10) comment '姓名',
+       number varchar(10) comment '学号'
+   )comment '学生表';
+   
+   insert into student (id, name, number)
+   values (null,'孙悟空','10001'),(null,'猪八戒','10002'),(null,'沙僧','10003'),(null,'白龙马','10004'),(null,'唐僧','10005'),(null,'如来','10006');
+   
+   -- 课程表
+   create table course(
+       id int primary key auto_increment comment '主键ID',
+       name varchar(10) comment '课程名称'
+   )comment '课程表';
+   insert into course (id, name)
+   values (null,'Java'),(null,'Python'),(null,'MySQL'),(null,'JavaScript');
+   
+   -- 中间表
+   create table student_course(
+       id int auto_increment primary key comment '主键',
+       student_id int not null comment '学生ID',
+       course_id int not null comment '课程ID',
+       constraint fk_course_id foreign key (course_id) references course (id),
+       constraint fk_student_id foreign key (student_id) references student (id)
+   )comment '学生课程中间表';
+   
+   insert into student_course (id, student_id, course_id)
+   values (null,1,1),(null,1,2),(null,1,3),(null,2,1),(null,3,1),(null,4,1),(null,5,1),(null,6,1);
+   
+   select *
+   from student;
+   select *
+   from course;
+   select *
+   from student_course;
+   
+   ```
+
+   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011441277.png)
+
+4. 一对一
+
+   - 案例：用户 与 用户详情的关系
+
+   - 关系：一对一关系，用于单表拆分。将一张表的基础字段放在一张表中，其他详情字段放在另一张表中，以提升操作效率
+
+   - 实现：在任意一方加入外键，关联另一方的主键，并且设置外键为唯一的(unique)
+
+     ![image-20220601144716512](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011447544.png)
+
+     ```sql
+     -- -------------一对一-------------
+     create table tb_user(
+         id int primary key auto_increment comment '主键ID',
+         name varchar(10) comment '姓名',
+         age int comment '年龄',
+         gender char(1) comment '1:男,2:女',
+         phone char(11) comment '手机号'
+     )comment '用户基本信息';
+     
+     create table tb_user_edu(
+         id int primary key auto_increment comment '主键ID',
+         degree varchar(20) comment '学历',
+         major varchar(50) comment '专业',
+         primaryschool varchar(50) comment '小学',
+         middleschool varchar(50) comment '中学',
+         university varchar(50) comment '大学',
+         userid int unique comment '用户ID',
+         constraint fk_userid foreign key (userid) references tb_user (id)
+     
+     )comment '用户教育信息';
+     
+     
+     insert into tb_user (id, name, age, gender, phone)
+     values (null,'1',20,'男','18888888888'),
+            (null,'2',21,'男','18888888877'),
+            (null,'3',22,'女','18888888866'),
+            (null,'4',23,'男','18888888855');
+     insert into tb_user_edu (degree, major, primaryschool, middleschool, university, userid)
+     values ('本科','舞蹈','北京第一小学','北京第一中学','北京舞蹈学院',1),
+            ('本科','舞蹈','上海第一小学','上海第一中学','北京舞蹈学院',2),
+            ('本科','舞蹈','江苏第一小学','江苏第一中学','北京舞蹈学院',3),
+            ('本科','舞蹈','杭州第一小学','杭州第一中学','北京舞蹈学院',4);
+     
+     select *
+     from tb_user_edu;
+     ```
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.5.2、多表查询概述
+
+
+
+
+
+
+
+
+
+
+
+#### 1.5.3、内连接
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.5.4、外连接
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.5.5、自连接
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### 1.5.6、子查询
+
+
+
+
+
+
+
+
+
+
+
+#### 1.5.7、多表查询案例
 
 
 
