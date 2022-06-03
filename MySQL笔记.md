@@ -1114,41 +1114,50 @@ from emp;
 
      
 
-
-
-
-
-
-
-
-
-
-
-
-
 #### 1.5.2、多表查询概述
 
+1. 概述：
 
+   指从多张表中查询数据
 
+2. 笛卡尔积:
 
+   指的是在数学中，两个集合A集合和B集合的所有组合情况(在多表查询的时候，要消除无效的笛卡尔积)
 
+   ![image-20220603154004088](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206031540163.png)
 
+3. 多表查询分类
 
-
+   - 连接查询
+     - 内连接：相当于查询A、B交集部分数据
+     - 外连接：
+       - 左外连接：查询**左表**所有数据，以及两张表交集部分数据
+       - 右外连接：查询**右表**所有数据，以及两张表交集部分数据
+     - 自连接：查询表与自身的连接查询，自连接必须使用表别名
 
 
 
 #### 1.5.3、内连接
 
+1. 内连接语法
 
+   - 隐式内连接
 
+     ```sql
+     select 字段列表 from 表1,表2 where 条件...;
+     -- 隐式内连接
+     select emp.name,dept.name from emp,dept where dept_id = dept.id;
+     ```
 
+   - 显式内连接
 
+     ```sql
+     select 字段列表 from 表1 [inner] join 表2 on 连接条件...;
+     -- 显式内连接
+     select e.name,d.name from emp e join dept d on e.dept_id = d.id;
+     ```
 
-
-
-
-
+   内连接查询的是两张表交集的部分
 
 
 
