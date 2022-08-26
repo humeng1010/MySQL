@@ -56,7 +56,7 @@
 
    下载地址：https://dev.mysql.com/downloads/mysql/
    
-   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202205272017368.png)
+   ![](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260922930.png)
    
    数据模型：
    
@@ -158,7 +158,7 @@
 
 ##### 3、数据类型
 
-![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202205272057199.png)
+![](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260923055.png)
 
 (一个字节对应八个二进制位)
 
@@ -369,9 +369,9 @@ from employee;
    
    ```
 
-   <img src="https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202205290910758.png" style="zoom:50%;" />
+   <img src="https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260923707.png" style="zoom:50%;" />
 
-   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202205290912721.png)
+   ![](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260923461.png)
 
 2. 设置别名
 
@@ -876,7 +876,7 @@ select name,score,
 
 #### 1.4.2、约束演示
 
-![image-20220601124722431](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011308914.png)
+![image-20220601124722431](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260924576.png)
 
 ```sql
 -- -------------------------约束演示------------------------------
@@ -1011,7 +1011,7 @@ from emp;
    - 关系：一个部门对应多个员工，多个员工对应一个部门
    - 实现：在**多**的一方建立**外键**，指向**一**的一方的**主键**
 
-   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011415468.png)
+   ![](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260924635.png)
    
 3. 多对多
 
@@ -1019,7 +1019,7 @@ from emp;
    - 关系：一个学生可以选修多门课程，一门课程可以供多个学生选择
    - 实现：**建立第三张中间表，中间表至少包含两个外键，分别关联两方的主键**
 
-   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011421058.png)
+   ![](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260924270.png)
 
    ```sql
    -- ------------多对多------------
@@ -1062,7 +1062,7 @@ from emp;
    
    ```
 
-   ![](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011441277.png)
+   ![](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260924737.png)
 
 4. 一对一
 
@@ -1072,7 +1072,7 @@ from emp;
 
    - 实现：在任意一方加入外键，关联另一方的主键，并且设置外键为唯一的(unique)
 
-     ![image-20220601144716512](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206011447544.png)
+     ![image-20220601144716512](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260925792.png)
 
      ```sql
      -- -------------一对一-------------
@@ -1124,7 +1124,7 @@ from emp;
 
    指的是在数学中，两个集合A集合和B集合的所有组合情况(在多表查询的时候，要消除无效的笛卡尔积)
 
-   ![image-20220603154004088](https://xiaohualiyuntuchuang.oss-cn-hangzhou.aliyuncs.com/img/202206031540163.png)
+   ![image-20220603154004088](https://raw.githubusercontent.com/redyouzi/images-for-blog/main/img02/202208260925058.png)
 
 3. 多表查询分类
 
